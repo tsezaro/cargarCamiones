@@ -1,0 +1,160 @@
+import camion.*
+import cosas.*
+
+describe "comprobando funcionamiento de las cosas" {
+
+	test "test de peligrosidad del bumbeblee" {
+		
+		assert.equals(15,bumblebee.peligrosidad())
+		bumblebee.cargando()
+		assert.equals(30,bumblebee.peligrosidad())
+	}
+	
+	
+	
+	test "Metodos del Knight"{
+		assert.equals(500,knightRider.peso())
+		knightRider.cargando()
+		assert.equals(1,knightRider.bulto())
+	}
+	
+	
+	
+	test "efectividad de ladrillos"{
+		paqueteLadrillos.cargando()
+		assert.equals(24,paqueteLadrillos.peso())
+		assert.equals(2,paqueteLadrillos.peligrosidad())
+		assert.equals(1,paqueteLadrillos.bulto())
+		paqueteLadrillos.cargando()
+		paqueteLadrillos.cargando()
+		paqueteLadrillos.cargando()
+		paqueteLadrillos.cargando()
+		paqueteLadrillos.cargando()
+		assert.equals(2,paqueteLadrillos.bulto())
+	}
+	
+	
+	
+	test "peso de arenaGranel"{
+		arenaGranel.cargando()
+		arenaGranel.cargando()
+		assert.equals(40,arenaGranel.peso())
+	}
+	
+	
+	
+		
+	test "cargando misiles"{
+	
+		assert.equals(200, bateriaAntiAerea.peso())
+		assert.equals(0, bateriaAntiAerea.peligrosidad())
+		assert.equals(1, bateriaAntiAerea.bulto())
+	
+		bateriaAntiAerea.cargando()
+		
+		assert.equals(300, bateriaAntiAerea.peso())
+		assert.equals(100, bateriaAntiAerea.peligrosidad())
+		assert.equals(2, bateriaAntiAerea.bulto())
+	}
+	
+	
+	
+	test "contenedores a full"{
+		
+		assert.equals(0,contenedorPortuario.peligrosidad())
+		
+		contenedorPortuario.cargandoContenedor(knightRider)
+		contenedorPortuario.cargandoContenedor(bateriaAntiAerea)
+		contenedorPortuario.cargandoContenedor(arenaGranel)
+		
+		assert.equals(800, contenedorPortuario.peso())
+		assert.equals(10, contenedorPortuario.peligrosidad())
+		assert.equals(4, contenedorPortuario.bulto())
+		
+		contenedorPortuario.cargando()
+		
+		assert.equals(920, contenedorPortuario.peso())
+		assert.equals(100, contenedorPortuario.peligrosidad())
+		assert.equals(5, contenedorPortuario.bulto())
+	}
+	
+	
+	
+	test "peso de residuos"{
+		residuosRadioactivos.cargando()
+		residuosRadioactivos.cargando()
+		residuosRadioactivos.cargando()
+		assert.equals(45, residuosRadioactivos.peso())
+	}
+	
+	
+	test "Embalando objeto"{
+		
+		embalajeDeSeguridad.embalaje(bumblebee)
+		assert.equals(800, embalajeDeSeguridad.peso()) 
+		assert.equals(7.5, embalajeDeSeguridad.peligrosidad())
+		assert.equals(2, embalajeDeSeguridad.bulto())
+	}
+	
+}
+
+
+
+describe "Comprobando la funcionalidad del camión"{
+	
+		
+	test "cargando cosas y comprobando el peso par y el de nivel"{
+		camion.cargar(residuosRadioactivos)
+		camion.cargar(knightRider)
+		camion.cargar(bumblebee)
+		
+		
+		assert.notThat(camion.todoPesoPar())
+		assert.equals(bumblebee,camion.elDeNivel(30))
+//		assert.throwsException(camion.elDeNivel(99))
+	}
+	
+	test "cargando cosas y comprobando el peso total, exceso de peso, descarga y variaciones en niveles de peligrosidad"{
+		
+		camion.cargar(residuosRadioactivos)
+		camion.cargar(knightRider)
+		camion.cargar(bumblebee)
+		
+		assert.equals(2315,camion.pesoTotal())
+		camion.cargar(bateriaAntiAerea)
+		
+		assert.that(camion.excedidoDePeso())
+		
+		assert.equals([residuosRadioactivos,bateriaAntiAerea],camion.objetosQueSuperanPeligrosidad(50))
+		
+		camion.descargar(bumblebee)
+			
+		assert.equals([residuosRadioactivos,bateriaAntiAerea],camion.objetosMasPeligrososQue(knightRider))
+	
+		assert.that(camion.puedeCircularEnRuta(10000))
+	}
+	
+	
+	
+	test "Cargando con mayor y menor, bultos, peso mayor y lista de pesos"{
+		
+		contenedorPortuario.cargandoContenedor(knightRider)
+		contenedorPortuario.cargandoContenedor(paqueteLadrillos)
+		
+		camion.cargar(arenaGranel)
+		camion.cargar(contenedorPortuario)
+		camion.cargar(embalajeDeSeguridad)
+		camion.cargar(bateriaAntiAerea)
+		
+		
+		
+		embalajeDeSeguridad.embalaje(bumblebee)
+		
+		assert.that(camion.tieneAlgoQuePesaEntre(400, 1000))
+		assert.equals(embalajeDeSeguridad, camion.cosaMasPesada())
+		assert.equals(8,camion.totalBultos())
+		assert.equals([20, 624, 800, 300] ,camion.pesos())
+		}
+	
+		
+}
